@@ -34,7 +34,9 @@ void on_new_connection(uv_stream_t *server, int status) {
 }
 
 void alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t* buf) {
-    uv_buf_init((char*) malloc(suggested_size), suggested_size);
+    //uv_buf_init((char*) malloc(suggested_size), suggested_size);
+    buf->base = malloc(suggested_size);
+    buf->len = suggested_size;
 }
 
 void on_client_read(uv_stream_t *_client, ssize_t nread, const uv_buf_t* buf) {
