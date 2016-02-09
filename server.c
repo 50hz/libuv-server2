@@ -24,6 +24,8 @@ void on_new_connection(uv_stream_t *server, int status) {
 
     client = (uv_tcp_t*) malloc(sizeof(uv_tcp_t));
 
+    uv_tcp_init(uv_default_loop(), client);
+
     int result = uv_accept(server, (uv_stream_t*) client);
 
     if (result == 0) {
@@ -58,23 +60,22 @@ void on_client_write(uv_write_t *req, int status) {
         uv_close((uv_handle_t*) client, NULL);
         return;
     }
-    free(req);
-    char *buffer = (char*) req->data;
-    free(buffer);
+    //free(req);
+    //char *buffer = (char*) req->data;
+    //free(buffer);
     uv_close((uv_handle_t*) client, NULL);
 }
 
 void on_file_open(uv_fs_t *req) {
     if (req->result == -1) {
-        fprintf(stderr, "error on_file_read");
+        fprintf(stderr, "error on_file_open");
         uv_close((uv_handle_t*) client, NULL);
         return;
     }
-    //char *buffer = (char *) malloc(sizeof(char) * buffer_size);
-    uv_buf_t buffers[buffer_size];
+    char buf[buffer_size];
+    uv_buf_t bufs = uv_buf_init(buf, sizeof(buf));
     int offset = -1;
-    read_req.data = buffers;
-    uv_fs_read(uv_default_loop(), &read_req, req->result, buffers, sizeof(buffers), offset, on_file_read);
+    uv_fs_read(uv_default_loop(), &read_req, req->result, &bufs, 1, offset, on_file_read);
     uv_fs_req_cleanup(req);
 }
 
